@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "example-app",
+    "slug": "example-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "scheme": "exampleapp",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.wof.deeplinksolutionsession.exampleapp",
+      "associatedDomains": [
+        "applinks:http-deeplink-worker.0xwof.workers.dev"
+      ]
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "dev.wof.deeplinksolutionsession.exampleapp",
+      "intentFilters": [{
+        "autoVerify": true,
+        "action": "VIEW",
+        "data": {
+          "scheme": "https",
+          "host": "http-deeplink-worker.0xwof.workers.dev"
+        },
+        "category": [
+          "BROWSABLE",
+          "DEFAULT"
+        ]
+      }]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

@@ -31,8 +31,8 @@ const fetch = async (
         })
     }
     else if (
-        url.searchParams.get('store_fallback') == 'true'
-        || url.searchParams.get('web_fallback') !== null
+        (url.searchParams.get('store_fallback') === 'true' || url.searchParams.get('web_fallback') !== null)
+        && url.searchParams.get('directFallback') !== 'true'
     ) {
         return new Response('FOUND', {
             status: 302,
@@ -41,7 +41,7 @@ const fetch = async (
             },
         })
     }
-    else if (url.searchParams.get('store_fallback') == 'true') {
+    else if (url.searchParams.get('store_fallback') === 'true') {
         return new Response(fallbackService.renderStoreFallback(userAgent), {
             status: 200,
             headers: {

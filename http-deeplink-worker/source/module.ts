@@ -30,7 +30,18 @@ const fetch = async (
             },
         })
     }
-    else if (url.searchParams.get('store_fallback') === 'true') {
+    else if (
+        url.searchParams.get('store_fallback') == 'true'
+        || url.searchParams.get('web_fallback') !== null
+    ) {
+        return new Response('FOUND', {
+            status: 302,
+            headers: {
+                'Location': url.href.replace('://http-deeplink-worker', '://scheme-deeplink-worker')
+            },
+        })
+    }
+    else if (url.searchParams.get('store_fallback') == 'true') {
         return new Response(fallbackService.renderStoreFallback(userAgent), {
             status: 200,
             headers: {
@@ -51,8 +62,8 @@ const fetch = async (
         return new Response('FOUND', {
             status: 302,
             headers: {
-                'Location': 'about:blank'
-            }
+                'Location': 'about:blank',
+            },
         })
     }
 }

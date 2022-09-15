@@ -1,12 +1,16 @@
 import { APPLICATION } from './constant/application'
 import { SUPPORT } from './constant/support'
 import { createCustomURLSchemeService } from './service/custom_url_scheme_service'
+import { createIntentSchemeService } from './service/intent_scheme_service'
+import { createMarketSchemeService } from './service/market_scheme_service'
 import { createUniversalLinksAlertService } from './service/universal_links_alert_service'
 import { createUserAgent } from './utility/user_agent'
 
 interface Env {}
 
 const customURLSchemeService = createCustomURLSchemeService()
+const intentSchemeService = createIntentSchemeService()
+const marketSchemeService = createMarketSchemeService()
 const universalLinksAlertService = createUniversalLinksAlertService()
 
 const fetch = async (
@@ -44,32 +48,82 @@ const fetch = async (
                 })
             }
         }
-        else {
-            return new Response(customURLSchemeService.renderStoreFallback(deeplink, userAgent), {
-                status: 200,
-                headers: {
-                    'Content-Type': 'text/html',
-                },
-            })
+        else if (os === 'android') {
+            const support = Object(SUPPORT.android)[app] ?? SUPPORT.android['other']
+            if (support.intent) {
+                return new Response(intentSchemeService.renderStoreFallback(deeplink), {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'text/html',
+                    },
+                })
+            }
+            else if (support.market) {
+                return new Response(marketSchemeService.renderStoreFallback(deeplink), {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'text/html',
+                    },
+                })
+            }
+            else if (support.scheme) {
+                return new Response(customURLSchemeService.renderStoreFallback(deeplink, userAgent), {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'text/html',
+                    },
+                })
+            }
         }
     }
     else if (url.searchParams.get('web_fallback') !== null) {
         const fallback = decodeURIComponent(url.searchParams.get('web_fallback')!)
-        return new Response(customURLSchemeService.renderWebFallback(deeplink, fallback), {
-            status: 200,
-            headers: {
-                'Content-Type': 'text/html',
-            },
-        })
-    }
-    else {
-        return new Response('FOUND', {
-            status: 302,
-            headers: {
-                'Location': 'about:blank'
+        if (os === 'ios') {
+            const support = Object(SUPPORT.ios)[app] ?? SUPPORT.ios['other']
+            if (support.scheme) {
+                return new Response(customURLSchemeService.renderWebFallback(deeplink, fallback), {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'text/html',
+                    },
+                })
             }
-        })
+            else {
+                return new Response(universalLinksAlertService.render(url.href), {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'text/html',
+                    },
+                })
+            }            
+        }
+        else if (os === 'android') {
+            const support = Object(SUPPORT.android)[app] ?? SUPPORT.android['other']
+            if (support.intent) {
+                return new Response(intentSchemeService.renderWebFallback(deeplink, fallback), {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'text/html',
+                    },
+                })
+            }
+            else if (support.scheme) {
+                return new Response(customURLSchemeService.renderWebFallback(deeplink, fallback), {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'text/html',
+                    },
+                })
+            }
+        }
     }
+    
+    return new Response('FOUND', {
+        status: 302,
+        headers: {
+            'Location': 'about:blank'
+        }
+    })
 }
 
 export type { Env }

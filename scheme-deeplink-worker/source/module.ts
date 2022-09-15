@@ -1,5 +1,6 @@
 import { APPLICATION } from './constant/application'
 import { SUPPORT } from './constant/support'
+import { createAndroidChromeStoreFallbackService } from './service/android_chrome_store_fallback_service'
 import { createCustomURLSchemeService } from './service/custom_url_scheme_service'
 import { createIntentSchemeService } from './service/intent_scheme_service'
 import { createMarketSchemeService } from './service/market_scheme_service'
@@ -8,6 +9,7 @@ import { createUserAgent } from './utility/user_agent'
 
 interface Env {}
 
+const androidChromeStoreFallbackService = createAndroidChromeStoreFallbackService()
 const customURLSchemeService = createCustomURLSchemeService()
 const intentSchemeService = createIntentSchemeService()
 const marketSchemeService = createMarketSchemeService()
@@ -50,7 +52,15 @@ const fetch = async (
         }
         else if (os === 'android') {
             const support = Object(SUPPORT.android)[app] ?? SUPPORT.android['other']
-            if (support.intent) {
+            if (app === 'chrome') {
+                return new Response(androidChromeStoreFallbackService.renderStoreFallback(deeplink), {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'text/html',
+                    },
+                })
+            }
+            else if (support.intent) {
                 return new Response(intentSchemeService.renderStoreFallback(deeplink), {
                     status: 200,
                     headers: {

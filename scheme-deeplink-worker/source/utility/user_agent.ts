@@ -7,6 +7,7 @@ const createUserAgent = (userAgent: string): UserAgent => {
 
     const app = (
         check_iOS_Safari(userAgent) ? 'safari'
+        : check_Chrome(userAgent) ? 'chrome'
         : check_Facebook_Messenger(userAgent) ? 'facebook_messenger'
         : 'other'
     )
@@ -36,13 +37,17 @@ const check_Facebook_Messenger = (userAgent: string) => (
     /\[(FBAN\/(?:MessengerLiteForiOS|MessengerForiOS)|FB_IAB\/(?:MESSENGER|Orca-Android))/.test(userAgent)
 )
 
+const check_Chrome = (userAgent: string) => (
+    /(Chrome|CrMo|CriOS)\//.test(userAgent)
+)
+
 type UserAgent = {
     os: OS
     app: App
 }
 
 type OS = 'ios' | 'android' | 'other'
-type App = 'safari' | 'facebook_messenger' | 'other'
+type App = 'safari' | 'chrome' | 'facebook_messenger' | 'other'
 
 export { createUserAgent }
 export type { UserAgent, OS }

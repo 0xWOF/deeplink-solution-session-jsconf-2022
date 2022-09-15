@@ -1,0 +1,3 @@
+name = "deeplink-test-page"
+main = "source/module.ts"
+compatibility_date = "2022-09-13"
